@@ -42,6 +42,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//LongURL updater, keeps the shortened URL but changes the long to a new website.
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
@@ -54,12 +55,13 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(urlDatabase[req.params.shortURL]);
 });
 
+//edits the index page and redirects to the long URL changer on show
 app.post("/urls/:shortURL/edit", (req, res) => {
   const shortURL = req.params.shortURL;
 
   res.redirect(`/urls/${shortURL}`);
 });
-
+// delete button in the index page
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
