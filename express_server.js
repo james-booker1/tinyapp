@@ -26,8 +26,8 @@ const urlDatabase = {
 // });
 
 app.get("/urls", (req, res) => {
-  console.log("users", users);
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  //console.log("users", users);
+  const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
   res.render("urls_index", templateVars);
 });
 
@@ -41,13 +41,13 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    users: req.cookies["user_id"],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
   };
@@ -83,10 +83,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //Logout
 app.post("/logout", (req, res) => {
   console.log("logout");
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/register");
 });
 // Login
+
+app.get("/login", (res, req) => {
+  res.render("urls_index.ejs");
+});
 
 app.post("/login", (req, res) => {
   const username = req.body.username;
@@ -111,7 +115,7 @@ const users = {
 };
 
 app.get("/register", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
   res.render("urls_register", templateVars);
 });
 
@@ -122,8 +126,19 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password,
   };
-
-  res.cookie("user_id", randomId);
+  if (users[randomId].id === "" || users[randomId].password === "") {
+    return res
+      .status(404)
+      .send("You need a password and username to continue - Try again");
+  }
+  if (users[randomId].email === users[randomId].email) {
+    return res
+      .status(400)
+      .send(
+        "You need to choose a different username as this is regestered - Try again"
+      );
+  }
+  res.cookie("user_id", users[randomId]);
   res.redirect("/urls");
 });
 
