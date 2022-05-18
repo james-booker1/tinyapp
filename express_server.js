@@ -117,7 +117,7 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   const randomId = Math.random().toString(36).slice(2, 8);
-  users[req.body.id] = {
+  users[randomId] = {
     id: randomId,
     email: req.body.email,
     password: req.body.password,
