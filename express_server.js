@@ -4,6 +4,8 @@ const PORT = 8080;
 const cookie = require("cookie-parser");
 
 const bodyParser = require("body-parser");
+const { emailChecker } = require("./helper");
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
@@ -121,23 +123,25 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   const randomId = Math.random().toString(36).slice(2, 8);
-  users[randomId] = {
-    id: randomId,
-    email: req.body.email,
-    password: req.body.password,
-  };
-  if (users[randomId].id === "" || users[randomId].password === "") {
+
+  if (req.body.email === "" || req.body.password === "") {
     return res
       .status(404)
       .send("You need a password and username to continue - Try again");
   }
-  if (users[randomId].email === users[randomId].email) {
+  if (emailChecker(req.body.email, users)) {
     return res
       .status(400)
       .send(
         "You need to choose a different username as this is regestered - Try again"
       );
   }
+  users[randomId] = {
+    id: randomId,
+    email: req.body.email,
+    password: req.body.password,
+  };
+  console.log("userdatabase=========", users);
   res.cookie("user_id", users[randomId]);
   res.redirect("/urls");
 });
