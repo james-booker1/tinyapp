@@ -11,6 +11,15 @@ const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
+// Login
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  if (!username) {
+    return res.status(401).send("Wrong password - Try again");
+  }
+  res.cookie("username", username);
+  res.redirect("/urls");
+});
 
 app.get("/", (req, res) => {
   res.send("Hello!");
