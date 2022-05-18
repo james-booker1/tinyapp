@@ -22,11 +22,6 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-// app.get("/login", (req, res) => {
-//   const templateVars = username;
-//   console.log(templateVars);
-// });
-
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -45,7 +40,8 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
