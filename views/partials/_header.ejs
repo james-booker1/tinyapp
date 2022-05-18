@@ -12,9 +12,9 @@
     </div>
     <div>
       <% if(!users){ %>
-           <form method="POST" action="/login" class="navbar-nav d-flex justify-content-between">
-        <input class="form-control" type="text" name="username" placeholder="username">
-        <button type="submit" class="btn btn-primary btn-sm ">Login</button>
+           <form method="POST" action="/logout" class="navbar-nav d-flex justify-content-between">
+        
+        <button type="submit" class="btn btn-primary btn-sm ">Logout</button>
       </form>
         <% } else{ %>  
           <p>Logged in as <%= users.email %> </p>

@@ -90,18 +90,19 @@ app.post("/logout", (req, res) => {
 });
 // Login
 
-app.get("/login", (res, req) => {
-  res.render("urls_index.ejs");
+app.get("/login", (req, res) => {
+  const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
+  res.render("urls_login", templateVars);
 });
 
-app.post("/login", (req, res) => {
-  const username = req.body.username;
-  if (!username) {
-    return res.status(401).send("Wrong password - Try again");
-  }
-  res.cookie("username", username);
-  res.redirect("/urls");
-});
+// app.post("/login", (req, res) => {
+//   const username = req.body.username;
+//   if (!username) {
+//     return res.status(401).send("Wrong password - Try again");
+//   }
+//   res.cookie("username", username);
+//   res.redirect("/urls");
+// });
 
 const users = {
   userRandomID: {
