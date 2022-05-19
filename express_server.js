@@ -2,12 +2,14 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const cookie = require("cookie-parser");
-
 const bodyParser = require("body-parser");
+const bcrypt = require("bcryptjs");
+const morgan = require("morgan");
 const { findUserByEmail, urlsForUser } = require("./helper");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(morgan());
 app.set("view engine", "ejs");
 app.use(cookie());
 // const urlDatabase = {
@@ -164,8 +166,9 @@ app.post("/register", (req, res) => {
   users[randomId] = {
     id: randomId,
     email: req.body.email,
-    password: req.body.password,
+    password: bcrypt.hashSync(req.body.password, 10),
   };
+
   res.cookie("user_id", randomId);
   res.redirect("/urls");
 });
@@ -178,23 +181,13 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const user = findUserByEmail(req.body.email, users);
 
-  if (!user) {
+  if (user && bcrypt.compareSync(req.body.password, user.password)) {
+    res.cookie("user_id", user.id);
+    res.redirect("/urls");
+  } else
     return res
-      .status(403)
-      .send(
-        "This email could not be found, did you checkout the registration page?"
-      );
-  }
-  if (user) {
-    if (user.password !== req.body.password) {
-      return res
-        .status(401)
-        .send("Did you forget your password? Because this one isn't correct");
-    } else {
-      res.cookie("user_id", user.id);
-      res.redirect("/urls");
-    }
-  }
+      .status(401)
+      .send("Did you forget your password? Because this one isn't correct");
 });
 
 app.listen(PORT, () => {
