@@ -2,13 +2,13 @@
 
 const req = require("express/lib/request");
 
-const findUserByEmail = function (email, userDatabase) {
+const getUserByEmail = function (email, userDatabase) {
   for (const user in userDatabase) {
     if (userDatabase[user].email === email) {
       return userDatabase[user];
     }
   }
-  return false;
+  return undefined;
 };
 
 const urlsForUser = (id, database) => {
@@ -23,4 +23,4 @@ const urlsForUser = (id, database) => {
   return userURLs;
 };
 
-module.exports = { findUserByEmail, urlsForUser };
+module.exports = { getUserByEmail, urlsForUser };
