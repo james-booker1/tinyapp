@@ -9,19 +9,29 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
+      
+      </div>
+      <div>
+        
     </div>
     <div>
       <% if(!users){ %>
-           <form method="POST" action="/logout" class="navbar-nav d-flex justify-content-between">
-        
-        <button type="submit" class="btn btn-primary btn-sm ">Logout</button>
-      </form>
+           <div>
+          <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/register">Register</a>
+        <a class="nav-item nav-link" href="/login">Login</a>
+      </div>
+      
         <% } else{ %>  
+          <div>
           <p>Logged in as <%= users.email %> </p>
+        </div>
+        <div>
           <form method="POST" action="/logout" class="navbar-nav d-flex justify-content-between">
             
             <button type="submit" class="btn btn-primary btn-sm ">Logout</button>
           </form>
+        </div>
        <% } %>
       </div>
   </nav>

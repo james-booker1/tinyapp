@@ -4,7 +4,7 @@ const PORT = 8080;
 const cookie = require("cookie-parser");
 
 const bodyParser = require("body-parser");
-const { emailChecker } = require("./helper");
+const { findUserByEmail, passwordChecker } = require("./helper");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -29,7 +29,10 @@ const urlDatabase = {
 
 app.get("/urls", (req, res) => {
   //console.log("users", users);
-  const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
+  const templateVars = {
+    urls: urlDatabase,
+    users: req.cookies["user_id"],
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -90,20 +93,6 @@ app.post("/logout", (req, res) => {
 });
 // Login
 
-app.get("/login", (req, res) => {
-  const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
-  res.render("urls_login", templateVars);
-});
-
-// app.post("/login", (req, res) => {
-//   const username = req.body.username;
-//   if (!username) {
-//     return res.status(401).send("Wrong password - Try again");
-//   }
-//   res.cookie("username", username);
-//   res.redirect("/urls");
-// });
-
 const users = {
   userRandomID: {
     id: "userRandomID",
@@ -130,7 +119,7 @@ app.post("/register", (req, res) => {
       .status(404)
       .send("You need a password and username to continue - Try again");
   }
-  if (emailChecker(req.body.email, users)) {
+  if (findUserByEmail(req.body.email, users)) {
     return res
       .status(400)
       .send(
@@ -142,9 +131,35 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password,
   };
-  console.log("userdatabase=========", users);
   res.cookie("user_id", users[randomId]);
   res.redirect("/urls");
+});
+
+app.get("/login", (req, res) => {
+  const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
+  res.render("urls_login", templateVars);
+});
+
+app.post("/login", (req, res) => {
+  const user = findUserByEmail(req.body.email, users);
+
+  if (!user) {
+    return res
+      .status(403)
+      .send(
+        "This email could not be found, did you checkout the registration page?"
+      );
+  }
+  if (user) {
+    if (user.password !== req.body.password) {
+      return res
+        .status(401)
+        .send("Did you forget your password? Because this one isn't correct");
+    } else {
+      res.cookie("user_id", user.id);
+      res.redirect("/urls");
+    }
+  }
 });
 
 app.listen(PORT, () => {
