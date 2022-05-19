@@ -4,7 +4,7 @@ const PORT = 8080;
 const cookie = require("cookie-parser");
 
 const bodyParser = require("body-parser");
-const { findUserByEmail, passwordChecker } = require("./helper");
+const { findUserByEmail, urlsForUser } = require("./helper");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -41,11 +41,20 @@ const urlDatabase = {
 
 app.get("/urls", (req, res) => {
   //console.log("users", users);
+  if (!req.cookies["user_id"]) {
+    return res.send("You need to be logging it to access this");
+  }
+  let userID = req.cookies["user_id"];
+  const user = users[userID];
+
   const templateVars = {
-    urls: urlDatabase,
-    users: req.cookies["user_id"],
+    users: user,
+    urls: urlsForUser(userID, urlDatabase),
   };
-  res.render("urls_index", templateVars);
+  let newUserDatabase = urlsForUser(userID, urlDatabase);
+  if (newUserDatabase) {
+    res.render("urls_index", templateVars);
+  }
 });
 
 //Generates random short URL
@@ -71,6 +80,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
   if (!urlDatabase.hasOwnProperty(shortURL)) {
     return res.status(404).send("The page request was not found");
   }
@@ -156,7 +166,7 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password,
   };
-  res.cookie("user_id", users[randomId]);
+  res.cookie("user_id", randomId);
   res.redirect("/urls");
 });
 

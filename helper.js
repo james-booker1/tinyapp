@@ -1,5 +1,7 @@
 // File containing functions used by express_server.js
 
+const req = require("express/lib/request");
+
 const findUserByEmail = function (email, userDatabase) {
   for (const user in userDatabase) {
     if (userDatabase[user].email === email) {
@@ -9,19 +11,16 @@ const findUserByEmail = function (email, userDatabase) {
   return false;
 };
 
-const passwordChecker = function (password, userDatabase) {
-  for (const pwd in userDatabase) {
-    if (userDatabase[pwd].password === password) {
-      return password;
+const urlsForUser = (id, database) => {
+  let userURLs = {};
+
+  for (const url in database) {
+    if (id === database[url].userID) {
+      userURLs[url] = database[url];
     }
   }
+
+  return userURLs;
 };
 
-const loggedInUser = function (email, userDatabase) {
-  for (const key in userDatabase) {
-    if (userDatabase[key].email === email) {
-    }
-  }
-};
-
-module.exports = { findUserByEmail, passwordChecker };
+module.exports = { findUserByEmail, urlsForUser };
