@@ -10,9 +10,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 app.use(cookie());
+// const urlDatabase = {
+//   b2xVn2: "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com",
+// };
+
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b6UTxQ: {
+    //shortURL
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 // app.get("/", (req, res) => {
@@ -43,8 +55,10 @@ app.post("/urls", (req, res) => {
   }
   const shortURL = Math.random().toString(36).slice(2, 8);
 
-  urlDatabase[shortURL] = req.body.longURL;
-
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: req.cookies["user_id"],
+  };
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -57,35 +71,34 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  if (!req.cookies["user_id"]) {
-    return res.send("You need to be logging it to access this");
+  if (!urlDatabase.hasOwnProperty(shortURL)) {
+    return res.status(404).send("The page request was not found");
   }
+
   const templateVars = {
     users: req.cookies["user_id"],
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
   };
 
   res.render("urls_show", templateVars);
 });
-//edits the index page and redirects to the long URL changer on show
-// app.get("/urls/:shortURL", (req, res) => {
-//   const shortURL = req.params.shortURL;
 
-//   res.redirect(`/urls/${shortURL}`);
-//   //res.redirect("urls_show");
-// });
 //LongURL updater, keeps the shortened URL but changes the long to a new website.
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL].longURL = longURL;
 
   res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL]);
+  const shortURL = req.params.shortURL;
+  if (!urlDatabase.hasOwnProperty(shortURL)) {
+    return res.status(404).send("The page request was not found");
+  }
+  res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
 // delete button in the index page
