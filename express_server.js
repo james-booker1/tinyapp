@@ -38,6 +38,9 @@ app.get("/urls", (req, res) => {
 
 //Generates random short URL
 app.post("/urls", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    return res.send("You need to be logging it to access this");
+  }
   const shortURL = Math.random().toString(36).slice(2, 8);
 
   urlDatabase[shortURL] = req.body.longURL;
@@ -46,11 +49,17 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    res.redirect("/login");
+  }
   const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    return res.send("You need to be logging it to access this");
+  }
   const templateVars = {
     users: req.cookies["user_id"],
     shortURL: req.params.shortURL,
@@ -81,6 +90,9 @@ app.get("/u/:shortURL", (req, res) => {
 
 // delete button in the index page
 app.post("/urls/:shortURL/delete", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    return res.send("You need to be logging it to access this");
+  }
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
