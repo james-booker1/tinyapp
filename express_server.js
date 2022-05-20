@@ -104,7 +104,7 @@ app.get("/urls/:shortURL", (req, res) => {
     longURL: urlDatabase[req.params.shortURL].longURL,
   };
 
-  res.render("urls_show", templateVars);
+  res.render("urls_show", templateVars[users]);
 });
 
 //Renders page stored in short URL
