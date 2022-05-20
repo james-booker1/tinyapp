@@ -23,10 +23,9 @@
       </div>
       
         <% } else{ %>  
-          <div>
+          <div class="d-flex">
           <p>Logged in as <%= users.email %> </p>
-        </div>
-        <div>
+        
           <form method="POST" action="/logout" class="navbar-nav d-flex justify-content-between">
             
             <button type="submit" class="btn btn-primary btn-sm ">Logout</button>

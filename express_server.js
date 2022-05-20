@@ -26,7 +26,6 @@ app.use(
 
 const urlDatabase = {
   b6UTxQ: {
-    //shortURL
     longURL: "https://www.tsn.ca",
     userID: "aJ48lW",
   },
@@ -36,9 +35,11 @@ const urlDatabase = {
   },
 };
 
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
+app.get("/", (req, res) => {
+  if (!req.session.user_id) {
+    res.redirect("/login");
+  } else res.redirect("/urls");
+});
 
 // app.get("/urls.json", (req, res) => {
 //   res.json(urlDatabase);
@@ -76,6 +77,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: req.session.user_id,
+    dateCreated: new Date(),
   };
   res.redirect(`/urls/${shortURL}`);
 });
@@ -84,11 +86,14 @@ app.get("/urls/new", (req, res) => {
   if (!req.session.user_id) {
     res.redirect("/login");
   }
-  const templateVars = { urls: urlDatabase, users: req.session.user_id };
+  const templateVars = { urls: urlDatabase, users: users[req.session.user_id] };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
+  if (!req.session.user_id) {
+    res.redirect("/login");
+  }
   const shortURL = req.params.shortURL;
   if (!urlDatabase.hasOwnProperty(shortURL)) {
     return res.status(404).send("The page request was not found");
@@ -133,7 +138,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/logout", (req, res) => {
   console.log("logout");
   req.session = null;
-  res.redirect("/register");
+  res.redirect("/urls");
 });
 // Login
 
@@ -151,6 +156,9 @@ const users = {
 };
 
 app.get("/register", (req, res) => {
+  if (req.session.user_id) {
+    res.redirect("/urls");
+  }
   const templateVars = { urls: urlDatabase, users: req.session.user_id };
   res.render("urls_register", templateVars);
 });
@@ -158,17 +166,13 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const randomId = Math.random().toString(36).slice(2, 8);
 
-  if (req.body.email === "" || req.body.password === "") {
-    return res
-      .status(404)
-      .send("You need a password and username to continue - Try again");
-  }
+  // if (!req.body.email || !req.body.password) {
+  //   return res
+  //     .status(404)
+  //     .send("You need a password and username to continue - Try again");
+  // }
   if (getUserByEmail(req.body.email, users)) {
-    return res
-      .status(400)
-      .send(
-        "You need to choose a different username as this is regestered - Try again"
-      );
+    return res.status(400).send("This email already exists  - Try again");
   }
   users[randomId] = {
     id: randomId,
