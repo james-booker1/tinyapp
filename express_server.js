@@ -140,6 +140,10 @@ app.post("/urls/:shortURL", (req, res) => {
   const longURL = req.body.longURL;
   urlDatabase[shortURL].longURL = longURL;
 
+  if (!req.session.user_id || req.session.user_id !== urlDatabase[shortURL]) {
+    return res.send("You need to be logging it to access this");
+  }
+
   res.redirect("/urls");
 });
 
