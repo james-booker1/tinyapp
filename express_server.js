@@ -99,12 +99,12 @@ app.get("/urls/:shortURL", (req, res) => {
   }
 
   const templateVars = {
-    users: req.session.user_id,
+    users: users[req.session.user_id],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
   };
 
-  res.render("urls_show", templateVars[users]);
+  res.render("urls_show", templateVars);
 });
 
 //Renders page stored in short URL
@@ -185,7 +185,7 @@ app.post("/login", (req, res) => {
 //Logout
 app.post("/logout", (req, res) => {
   req.session = null;
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.listen(PORT, () => {
