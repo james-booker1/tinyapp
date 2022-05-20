@@ -11,9 +11,7 @@
       </div>
       
       </div>
-      <div>
-        
-    </div>
+      
     <div>
       <% if(!users){ %>
            <div>
@@ -23,8 +21,8 @@
       </div>
       
         <% } else{ %>  
-          <div class="d-flex">
-          <p>Logged in as <%= users.email %> </p>
+          <div class="d-flex" style="align-items: center;">
+            <div style="margin-right: 5px;"> <span>Logged in as <%= users.email %> </span></div>
         
           <form method="POST" action="/logout" class="navbar-nav d-flex justify-content-between">
             
