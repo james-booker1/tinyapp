@@ -94,6 +94,10 @@ app.get("/urls/:shortURL", (req, res) => {
     res.redirect("/login");
   }
   const shortURL = req.params.shortURL;
+  if (req.session.user_id !== urlDatabase[shortURL].userID) {
+    return res.status(401).send("you dont have acess to this page");
+  }
+
   if (!urlDatabase.hasOwnProperty(shortURL)) {
     return res.status(404).send("The page request was not found");
   }
@@ -138,12 +142,17 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
-  urlDatabase[shortURL].longURL = longURL;
 
-  if (!req.session.user_id || req.session.user_id !== urlDatabase[shortURL]) {
-    return res.send("You need to be logging it to access this");
+  if (!req.session.user_id) {
+    return res.send("You need to be logging it to edit this");
   }
 
+  if (req.session.user_id !== urlDatabase[shortURL].userID) {
+    return res
+      .status(401)
+      .send("you dont have access to make changes to this url");
+  }
+  urlDatabase[shortURL].longURL = longURL;
   res.redirect("/urls");
 });
 
